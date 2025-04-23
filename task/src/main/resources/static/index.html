@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/global.css" />
+  <title>S3 file download</title>
+</head>
+<body>
+  <div class="container">
+    <form>
+      <table border="1">
+        <thead>
+          <tr>
+            <th>구분</th>
+            <th>파일 이름</th>
+            <th>용량</th>
+          </tr>
+        </thead>
+        <tfoot>
+          <tr>
+            <td><input type="button" id="viewFile" value="조회"/></td>
+            <td><p id="totalcnt"></p></td>
+            <td><input style="float:right" type="button" value="다운로드"/></td>
+          </tr>
+        </tfoot>
+        <tbody>
+          <!--
+          <tr>  
+            <td><input type="checkbox"/></td>
+            <td>123.jpg</td>
+            <td>123mb</td>
+          </tr>
+          -->
+        </tbody>
+      </table>
+
+    </form>
+  </div>
+</body>
+<script src="js/showFile.js"></script>
+</html>
