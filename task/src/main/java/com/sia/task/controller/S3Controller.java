@@ -20,8 +20,6 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 
-
-
 @RestController
 @RequestMapping(value="/file", method=RequestMethod.GET)
 public class S3Controller {
@@ -36,10 +34,6 @@ public class S3Controller {
   @GetMapping("/list")
   public ResponseEntity<List<S3ObjectSummary>> ListS3(){
     System.out.println("S3Controller.java /file/list 호출됨");
-      // String accessKey="${ACCESS_KEY_ID}";
-      // String secretKey="${SECRET_ACCESS_KEY}";
-      // String bucketName="${ORIGINAL_BUCKET_NAME}";
-      //String folderName="tester-Jangjunhui-idjjh1998-1745222663/";
 
       AWSCredentials crd = new BasicAWSCredentials(accessKey, secretKey);
       AmazonS3 s3Client = AmazonS3ClientBuilder
@@ -48,17 +42,6 @@ public class S3Controller {
               .withRegion(Regions.AP_NORTHEAST_2)
               .build();
 
-      // ObjectListing objects = s3Client.listObjects(bucketName);
-      // //ObjectListing objects = s3Client.listObjects(bucketName, folderName);
-      // do{
-      //   for (S3ObjectSummary objectSummary : objects.getObjectSummaries()){
-      //     System.out.println(objectSummary+"\n");
-      //   }
-      //   objects = s3Client.listNextBatchOfObjects(objects);
-      // }
-      // while (objects.isTruncated());
-      // System.out.println(objects.getObjectSummaries().getClass().getName());
-      // return new ResponseEntity<>(objects.getObjectSummaries(), HttpStatus.OK);
     ObjectListing listing = s3Client.listObjects(bucketName /*, folderName */);
     List<S3ObjectSummary> allSummaries = new ArrayList<>();
 
