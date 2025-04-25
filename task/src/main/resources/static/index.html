@@ -8,7 +8,7 @@
 </head>
 <body>
   <div class="container">
-    <form id="downloadFileForm" method="post" action="/file/download">
+    <form id="fileForm">
       <table border="1">
         <thead>
           <tr>
@@ -21,7 +21,7 @@
           <tr>
             <td><input type="button" id="viewFile" value="조회"/></td>
             <td><p id="totalcnt"></p></td>
-            <td><input style="float:right" type="submit" id="transCOGNupload" value="변환 및 업로드"/></td>
+            <td><input style="float:right" type="button" id="processBtn" value="변환 및 업로드"/></td>
           </tr>
         </tfoot>
         <tbody>
@@ -39,5 +39,5 @@
   </div>
 </body>
 <script src="js/showFile.js"></script>
-<script src="js/downloadFile.js"></script>
+<script src="js/fileProcessing.js"></script>
 </html>

@@ -1,5 +1,5 @@
 package com.sia.task.service;
 
-public class FileServiceImpl {
+public class UploadService {
   
 }
