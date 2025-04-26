@@ -1,5 +1,6 @@
 package com.sia.task.fileDTO;
 
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.Map;
 
@@ -17,8 +18,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class FileDTO {
-  private String bucketName;
   private String name;
+  private Path filePath;
+  private Path convertedFilePath;
+
+  private String bucketName;
   private String eTag;
   private Long size;
   private Date lastModify;

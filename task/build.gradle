@@ -2,10 +2,16 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.4'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 group = 'com.sia'
 version = '0.0.1-SNAPSHOT'
+
+shadowJar {
+	archiveClassifier.set('all') // 결과물이 task-all.jar
+	// src/main/resources/* 포함
+}
 
 java {
 	toolchain {
@@ -20,7 +26,10 @@ configurations {
 }
 
 repositories {
+	gradlePluginPortal()
+	mavenLocal()
 	mavenCentral()
+	flatDir{dirs 'libs'}
 }
 
 dependencies {
@@ -46,6 +55,10 @@ dependencies {
 	/** 파일 형식 체크를 위한 라이브러러 */
 	// https://mvnrepository.com/artifact/org.apache.tika/tika-core
 	implementation 'org.apache.tika:tika-core:2.9.1'
+
+	// GDAL Java 바인딩
+	// http://opensource.org/licenses/MIT
+  implementation 'org.gdal:gdal:3.10.0'
 }
 
 tasks.named('test') {

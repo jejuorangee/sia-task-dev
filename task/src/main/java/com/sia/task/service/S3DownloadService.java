@@ -86,15 +86,17 @@ public class S3DownloadService {
       long isDownload;
       try {
         isDownload = Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
+        System.out.println(file.getName()+" 다운로드 중");
+        file.setFilePath(target);
         result.add(file);
       } catch (IOException e) {
         e.printStackTrace();
         System.out.println("파일 복사 실패 ! : "+ e);
         return result;
       }
-
+      
       // 파일이 생성됐는지 확인 로그
-      System.out.println(file.getName() +" : "+ isDownload);
+      System.out.println(file.getName() +" : "+ isDownload + file.getFilePath()+ "다운로드 완료");
     }
     // 다운로드 성공 시
     return result;
