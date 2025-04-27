@@ -1,16 +1,20 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.4.4'
+	id 'org.springframework.boot' version '3.4.5'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'com.github.johnrengelman.shadow' version '7.1.2'
+	id 'application'
 }
 
 group = 'com.sia'
 version = '0.0.1-SNAPSHOT'
+mainClassName = 'com.sia.task.TaskApplication'
 
-shadowJar {
-	archiveClassifier.set('all') // 결과물이 task-all.jar
-	// src/main/resources/* 포함
+application{
+	// installDist로 만든 배포본을 실행할 때 JVM 옵션에 자동 포함
+	applicationDefaultJvmArgs = [
+		"-Djava.library.path=\${APP_HOME}/nativelib/window"
+	]
 }
 
 java {
@@ -54,13 +58,87 @@ dependencies {
 
 	/** 파일 형식 체크를 위한 라이브러러 */
 	// https://mvnrepository.com/artifact/org.apache.tika/tika-core
-	implementation 'org.apache.tika:tika-core:2.9.1'
+	// implementation 'org.apache.tika:tika-core:2.9.1'
 
 	// GDAL Java 바인딩
 	// http://opensource.org/licenses/MIT
   implementation 'org.gdal:gdal:3.10.0'
+
+	//implementation 'net.java.dev.jna:jna:5.13.0'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+// dll build/libs/nativelib/window로 복사
+task copyNativeLibs(type : Copy){
+	from("$projectDir/src/main/resources/nativelib/window")
+	into("$buildDir/libs/nativelib/window")
+}
+
+// shadowJar 빌드 전 복사 task 실행
+shadowJar {
+	archiveClassifier.set('all') // 결과물이 task-all.jar
+	// src/main/resources/* 포함
+	manifest {
+		attributes (
+			'Implementation-Title' : project.name,
+			'Implementation-Version' : project.version,
+			'Main-Class' :mainClassName
+		)
+	}
+	dependsOn copyNativeLibs
+	from(copyNativeLibs){
+		into 'nativelib/window'
+	}
+}
+
+// bootRun 에도 개발 중은 같은 경로를 JVM 옵션으로
+bootRun{
+	doFirst{
+		def nativeDir = file('src/main/resources/nativelib/window').absolutePath
+
+		def gdalData = "${nativeDir}/gdal-data"
+		def proj9Dir = "${nativeDir}/proj9"
+
+		// window가 DLL 의존성을 찾을 때 사용용
+		environment 'PATH', "${nativeDir};${System.getenv('PATH')}"
+
+		// JVM java.library.path
+		jvmArgs += "-Djava.library.path=${nativeDir}"
+
+
+		// gdal 내부 드라이버, 데이터를 찾을 때 사용용
+		environment 'GDAL_DATA', gdalData
+		environment 'PROJ9_LIB', proj9Dir
+	}
+}
+
+// 설치 배포(distribution) 생성
+//    ./gradlew installDist
+//    build/install/<projectName>/
+//    ├── bin/<projectName>    실행 스크립트에 java.library.path 지정
+//    ├── lib/<...>.jar
+//    └── nativelib/window/*.dll
+distributions{
+	main{
+		contents{
+			into('nativelib/window'){
+				from("$projectDir/src/main/resources/nativelib/window")
+			}
+		}
+	}
+}
+
+tasks.withType(CreateStartScripts){
+	// 생성된 startScripts 에서 jar 이름을 shadowJar 결과물 이름으로 치환
+	doLast{
+		unixScript.text = unixScript.text.replace(/\.jar/, '-all.jar')
+		windowScript.text = windowScript.text.replace(/\.jar/, '-all.jar')
+	}
+}
+
+tasks.named('installDist'){
+	dependsOn shadowJar
 }

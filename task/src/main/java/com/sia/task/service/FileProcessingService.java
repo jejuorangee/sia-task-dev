@@ -12,16 +12,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FileProcessingService {
   private final S3DownloadService downloadService;
-  //private final ConvertCOGService convertService;
+  private final ConvertCOGService convertService;
   //private final FileService fileService;
   //private final UploadService uploadService;
   
   public void fileProcessing(List<FileDTO> fileList){
     // 파일 다운로드
-    downloadService.getObject(fileList);
+    List<FileDTO> downloadList = downloadService.getObject(fileList);
     
     // 파일 COG 변환
-    // convertService
+    convertService.fileConvertCOG(downloadList);
 
     // 변환 파일 DB 저장
     // fileService

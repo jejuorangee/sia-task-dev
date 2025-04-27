@@ -15,13 +15,15 @@ import com.sia.task.fileDTO.FileDTO;
 
 @Service
 public class ConvertCOGService {
-  public void oneFileConvertCOG(List<FileDTO> downloadedFileList){
-    
+  public void fileConvertCOG(List<FileDTO> downloadedFileList){
+    System.out.println("ConvertCOGService.java fileConvertCOG() 호출");
     for(FileDTO file : downloadedFileList){
       // 파일 경로
       Path path = file.getFilePath();
       String fileName = file.getName();
-      String baseName = fileName.substring(fileName.lastIndexOf("."+1));
+      System.out.println(fileName);
+      System.out.println(fileName.substring(0, fileName.lastIndexOf(".")));
+      String baseName = fileName.substring(0, fileName.lastIndexOf("."));
 
       Path convertedFiles = path.getParent().resolve("convertedFiles");
       try{
@@ -31,7 +33,7 @@ public class ConvertCOGService {
         System.out.println("error : "+e);
         throw new RuntimeException("변환된 파일 디렉토리 생성 실패 :"+e);
       }
-
+      System.out.println("디렉토리 생성완료");
       String convertedFileName = "";
       Path converted;
       if (downloadedFileList.size() > 1) {
@@ -44,7 +46,7 @@ public class ConvertCOGService {
         }
       }
       else{
-        convertedFileName = baseName+"to_cog.tif";
+        convertedFileName = baseName+"_to_cog.tif";
         converted = convertedFiles.resolve(convertedFileName);
         int seq = 1;
         while (Files.exists(converted)){
@@ -52,18 +54,8 @@ public class ConvertCOGService {
           converted = convertedFiles.resolve(convertedFileName);
         }
       }
-
-
-      // // gdal 변환 옵션
-      // String[] options = new String[]{
-      //   "-of", "COG", // 출력 포맷 COG(Cloud Optimized GeoTiff)드라이버 설정
-      //   "-co", "COMPRESS=DEFLATE", // 압축 방식 DEFLATE 설정
-      //   "-co", "PREDICTOR=2", // 예측기 설정
-      //   "-co", "TILED=YES", // 타일 단위로 저장
-      //   "-co", "BLOCKSIZE=512", // 가로세로 크기 512x512설정 (16배수 권장)
-      //   "-co", "COPY_SRC_OVERVIEWS=YES" // 오버뷰 복사
-      // };
       
+      // TranslateOptions객체 인자가 Vector임
       Vector<String> options = new Vector<String>();
 
         options.add("-of"); options.add("COG"); // 출력 포맷 COG(Cloud Optimized GeoTiff)드라이버 설정
@@ -73,20 +65,25 @@ public class ConvertCOGService {
         options.add("-co"); options.add("BLOCKSIZE=512"); // 가로세로 크기 512x512설정 (16배수 권장)
         options.add("-co"); options.add("COPY_SRC_OVERVIEWS=YES"); // 오버뷰 복사
 
-      // try{
-      //   // 변환
-      //   gdal.Translate(convertedFileName, null, new TranslateOptions(options)).excute(
-      //     converted.toString()
-      //     gdal.Open(path.toString()),
-      //     new Translate.Options(options)
-      //   );
-      Dataset srcDataset = gdal.Open(convertedFiles.toString());
-      TranslateOptions translateOptions = new TranslateOptions(options);
-      gdal.Translate(converted.toString(), srcDataset, translateOptions);
-      srcDataset.delete();
-
-      file.setConvertedFilePath(converted);
-      System.out.println("변환 완료" +file.getConvertedFilePath());
+      
+      System.out.println("변환 시작");
+      System.out.println("path : "+path.toString());
+      synchronized(gdal.class){
+        Dataset srcDataset = gdal.Open(path.toString());
+        System.out.println("원본파일 오픈");
+        if(srcDataset == null){
+          throw new RuntimeException("원본파일을 열지 못함");
+        }
+        System.out.println("변환옵션 설정");
+        TranslateOptions translateOptions = new TranslateOptions(options);
+        System.out.println("변환 전");
+        gdal.Translate(converted.toString(), srcDataset, translateOptions);
+        System.out.println("변환 후");
+        srcDataset.delete();
+  
+        file.setConvertedFilePath(converted);
+        System.out.println("변환 완료" +file.getConvertedFilePath());
+      }
     }
   }
 }

@@ -9,6 +9,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 public class TaskApplication {
 
 	public static void main(String[] args) {
+		// System.setProperty("gdal.debug", "true");
 		// .env 파일 로드(루트 경로)
 		Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
 

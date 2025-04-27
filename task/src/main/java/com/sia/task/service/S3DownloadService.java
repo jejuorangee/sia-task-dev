@@ -65,6 +65,7 @@ public class S3DownloadService {
 
   // 다 건 다운로드
   public List<FileDTO> getObject(List<FileDTO> fileDTO) {
+    System.out.println("S3DownloadService.java getObject() 호출");
     List<FileDTO> result = new ArrayList<FileDTO>();
 
     for (FileDTO file : fileDTO) {
