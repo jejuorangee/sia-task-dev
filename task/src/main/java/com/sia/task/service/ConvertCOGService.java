@@ -3,6 +3,7 @@ package com.sia.task.service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -11,16 +12,19 @@ import org.gdal.gdal.TranslateOptions;
 import org.gdal.gdal.gdal;
 import org.springframework.stereotype.Service;
 
-import com.sia.task.fileDTO.FileDTO;
+//import com.sia.task.fileDTO.FileDTO;
+import com.sia.task.fileDTO.FileRequestDTO;
 
 @Service
 public class ConvertCOGService {
-  public void fileConvertCOG(List<FileDTO> downloadedFileList){
+  public List<FileRequestDTO> fileConvertCOG(List<FileRequestDTO> downloadedFileList){
     System.out.println("ConvertCOGService.java fileConvertCOG() 호출");
-    for(FileDTO file : downloadedFileList){
+
+    List<FileRequestDTO> convertedFileList = new ArrayList<FileRequestDTO>();
+    for(FileRequestDTO file : downloadedFileList){
       // 파일 경로
       Path path = file.getFilePath();
-      String fileName = file.getName();
+      String fileName = file.getOriginalFileName();
       System.out.println(fileName);
       System.out.println(fileName.substring(0, fileName.lastIndexOf(".")));
       String baseName = fileName.substring(0, fileName.lastIndexOf("."));
@@ -59,11 +63,11 @@ public class ConvertCOGService {
       Vector<String> options = new Vector<String>();
 
         options.add("-of"); options.add("COG"); // 출력 포맷 COG(Cloud Optimized GeoTiff)드라이버 설정
-        options.add("-co"); options.add("COMPRESS=DEFLATE"); // 압축 방식 DEFLATE 설정
-        options.add("-co"); options.add("PREDICTOR=2"); // 예측기 설정
-        options.add("-co"); options.add("TILED=YES"); // 타일 단위로 저장
-        options.add("-co"); options.add("BLOCKSIZE=512"); // 가로세로 크기 512x512설정 (16배수 권장)
-        options.add("-co"); options.add("COPY_SRC_OVERVIEWS=YES"); // 오버뷰 복사
+        //options.add("-co"); options.add("COMPRESS=DEFLATE"); // 압축 방식 DEFLATE 설정
+        //options.add("-co"); options.add("PREDICTOR=2"); // 예측기 설정
+        //options.add("-co"); options.add("TILED=YES"); // 타일 단위로 저장
+        //options.add("-co"); options.add("BLOCKSIZE=512"); // 가로세로 크기 512x512설정 (16배수 권장)
+        //options.add("-co"); options.add("COPY_SRC_OVERVIEWS=YES"); // 오버뷰 복사
 
       
       System.out.println("변환 시작");
@@ -82,8 +86,11 @@ public class ConvertCOGService {
         srcDataset.delete();
   
         file.setConvertedFilePath(converted);
+        file.setConvertedFileName(convertedFileName);
+        convertedFileList.add(file);
         System.out.println("변환 완료" +file.getConvertedFilePath());
       }
     }
+    return convertedFileList;
   }
 }

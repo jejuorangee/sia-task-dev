@@ -17,7 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
-import com.sia.task.fileDTO.FileDTO;
+//import com.sia.task.fileDTO.FileDTO;
+import com.sia.task.fileDTO.FileRequestDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -64,30 +65,30 @@ public class S3DownloadService {
 
 
   // 다 건 다운로드
-  public List<FileDTO> getObject(List<FileDTO> fileDTO) {
+  public List<FileRequestDTO> getObject(List<FileRequestDTO> fileDTO) {
     System.out.println("S3DownloadService.java getObject() 호출");
-    List<FileDTO> result = new ArrayList<FileDTO>();
+    List<FileRequestDTO> result = new ArrayList<FileRequestDTO>();
 
-    for (FileDTO file : fileDTO) {
+    for (FileRequestDTO file : fileDTO) {
       Path base = Paths.get(downloadBaseDir);
       Path target;
       try{
         Files.createDirectories(base);
         System.out.println("다운로드 디렉토리 생성됨 : "+base);
-        target = base.resolve(file.getName());
+        target = base.resolve(file.getOriginalFileName());
       } catch (IOException e){
         //throw new RuntimeException("다운로드 디렉토리 생성 실패 : "+ e );
         System.out.println("다운로드 디렉토리 생성 실패 : "+ e );
         return result;
       }
       
-      S3Object sobj = amazonS3.getObject(new GetObjectRequest(bucket, file.getName()));
+      S3Object sobj = amazonS3.getObject(new GetObjectRequest(bucket, file.getOriginalFileName()));
       InputStream in = sobj.getObjectContent();
       
       long isDownload;
       try {
         isDownload = Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
-        System.out.println(file.getName()+" 다운로드 중");
+        System.out.println(file.getOriginalFileName()+" 다운로드 중");
         file.setFilePath(target);
         result.add(file);
       } catch (IOException e) {
@@ -97,7 +98,7 @@ public class S3DownloadService {
       }
       
       // 파일이 생성됐는지 확인 로그
-      System.out.println(file.getName() +" : "+ isDownload + file.getFilePath()+ "다운로드 완료");
+      System.out.println(file.getOriginalFileName() +" : "+ isDownload + file.getFilePath()+ "다운로드 완료");
     }
     // 다운로드 성공 시
     return result;

@@ -1,8 +1,8 @@
 package com.sia.task.fileDTO;
 
 import java.nio.file.Path;
-import java.util.Date;
-import java.util.Map;
+// import java.util.Date;
+// import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,16 +22,20 @@ public class FileDTO {
   private Path filePath;
   private Path convertedFilePath;
 
-  private String bucketName;
-  private String eTag;
-  private Long size;
-  private Date lastModify;
-  private String storageClass;
-  private String ownerId;
-  private String ownerName;
+  private int width;
+  private int height;
+  private int band_count;
 
-  // S3 다운로드 데이터
-  private byte[] data;
-  private Map<String, String> httpheaders;
+  // private String bucketName;
+  // private String eTag;
+  // private Long size;
+  // private Date lastModify;
+  // private String storageClass;
+  // private String ownerId;
+  // private String ownerName;
+
+  // // S3 다운로드 데이터
+  // private byte[] data;
+  // private Map<String, String> httpheaders;
 
 }

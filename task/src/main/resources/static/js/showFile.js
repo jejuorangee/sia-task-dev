@@ -37,7 +37,7 @@ function renderTbody(data){
     const tdChk = document.createElement("td");
     const chk = document.createElement("input");
     chk.type = "checkbox";
-    chk.name = "name";
+    chk.name = "originalFileName";
     chk.value = item.key;
     tdChk.appendChild(chk);
     tr.appendChild(tdChk);

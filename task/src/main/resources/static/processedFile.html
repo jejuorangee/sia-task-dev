@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/global.css" />
   <title>Saved files</title>
 </head>
 <body>
@@ -11,14 +12,16 @@
       <table border="1">
         <thead>
           <tr>
-            <th>구분</th>
             <th>파일 이름</th>
-            <th>용량</th>
+            <th>원본 파일 이름</th>
+            <th>width</th>
+            <th>height</th>
+            <th>band_count</th>
           </tr>
         </thead>
         <tfoot>
           <tr>
-            <td><input type="button" id="viewFile" value="조회"/></td>
+            <td><input type="button" id="viewFile" value="업로드된 파일 조회"/></td>
             <td><p id="totalcnt"></p></td>
             <!-- <td><input style="float:right" type="button" value="변환"/></td> -->
           </tr>

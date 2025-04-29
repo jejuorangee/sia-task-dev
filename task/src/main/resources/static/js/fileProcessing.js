@@ -4,7 +4,7 @@ processBtn.addEventListener('click', function() {
   console.log("버튼 클릭됨");
   // 체크된 체크박스 value 모으기
   const checkedBoxes = Array.from(
-    document.querySelectorAll("input[name='name']:checked")
+    document.querySelectorAll("input[name='originalFileName']:checked")
   ).map(checkBox => checkBox.value)
   
   // 확인용 로그
@@ -22,12 +22,14 @@ processBtn.addEventListener('click', function() {
   if(checkedBoxes.length === 1){
     // 단건 요청
     url = "/file/process/one";
-    jsondata = {name : checkedBoxes[0]};
+    jsondata = {originalFileName : checkedBoxes[0]};
+    console.log(jsondata);
   }
   else {
     // 다건 요청
     url = "/file/process/multiple";
-    jsondata = checkedBoxes.map(name => ({ name }));
+    jsondata = checkedBoxes.map(originalFileName => ({ originalFileName }));
+    console.log(jsondata);
   }
   // 확인용 로그
   // const jsondata = JSON.stringify(checkedBoxes);
@@ -47,6 +49,7 @@ processBtn.addEventListener('click', function() {
       window.location.href = "/";
       throw new Error(response.status);
     }
+    alert("파일 처리가 완료되었습니다")
     window.location.href = "/file/processed";
   })
   .catch(err => {

@@ -18,8 +18,9 @@ public class TaskApplication {
 		System.setProperty("USERNAME", dotenv.get("USERNAME"));
 		System.setProperty("ACCESS_KEY_ID", dotenv.get("ACCESS_KEY_ID"));
 		System.setProperty("SECRET_ACCESS_KEY", dotenv.get("SECRET_ACCESS_KEY"));
-		System.setProperty("BUCKET_NAME", dotenv.get("BUCKET_NAME"));
 		System.setProperty("ORIGINAL_BUCKET_NAME", dotenv.get("ORIGINAL_BUCKET_NAME"));
+		System.setProperty("UPLOAD_BUCKET_NAME", dotenv.get("UPLOAD_BUCKET_NAME"));
+		System.setProperty("FOLDER_PATH", dotenv.get("FOLDER_PATH"));
 		System.setProperty("REGION", dotenv.get("REGION"));
 
 		// Spring boot 실행

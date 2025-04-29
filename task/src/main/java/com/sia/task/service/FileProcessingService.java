@@ -4,7 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.sia.task.fileDTO.FileDTO;
+//import com.sia.task.fileDTO.FileDTO;
+import com.sia.task.fileDTO.FileRequestDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,20 +14,27 @@ import lombok.RequiredArgsConstructor;
 public class FileProcessingService {
   private final S3DownloadService downloadService;
   private final ConvertCOGService convertService;
-  //private final FileService fileService;
-  //private final UploadService uploadService;
+  private final COGMetadataExtractorService extractorService;
+  private final FileService fileService;
+  private final S3UploadService uploadService;
   
-  public void fileProcessing(List<FileDTO> fileList){
+  public void fileProcessing(List<FileRequestDTO> fileList){
     // 파일 다운로드
-    List<FileDTO> downloadList = downloadService.getObject(fileList);
+    List<FileRequestDTO> downloadList = downloadService.getObject(fileList);
     
     // 파일 COG 변환
-    convertService.fileConvertCOG(downloadList);
+    List<FileRequestDTO> convertedList = convertService.fileConvertCOG(downloadList);
 
+    // COG 메타데이터 추출
+    List<FileRequestDTO> metadatas = extractorService.extractData(convertedList);
     // 변환 파일 DB 저장
-    // fileService
+    if(metadatas.size() > 1){
+      fileService.insertAll(fileList);
+    }else {
+      fileService.insert(metadatas.get(0));
+    }
 
     // 파일 업로드
-    // uploadService
+    uploadService.s3upload(metadatas);
   }
 }
