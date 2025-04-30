@@ -69,3 +69,13 @@ ex) Docker 또는 JDK custom build
 
 # 구글 드라이브
 https://drive.google.com/file/d/1P5dFbbtu_7NokdjLdaEc2SzmFdbbNAxb/view?usp=drive_link
+
+# 예상 면접 질문
+- GDAL과 Java 연동 시 DLL 충돌 문제를 겪었다고 했는데 이 문제를 루트 원인까지 해결하지 않고 우회하신 이유와 당시 고민했던 구체적인 다른 해결 방법은 무엇인가요?
+
+- installDist와 shadowJar를 함께 사용했는데 이 두 방식의 차이와 병행 사용의 장점을 설명해 주세요.
+
+- Dotenv를 사용했는데 Spring Boot에는 기본적으로 application.properties나 application.yml이 있습니다. 굳이 dotenv를 사용한 이유는 무엇인가요?
+
+# 노션
+https://www.notion.so/sia-1de8aad9af6280a59a6ded073602771f?pvs=4
