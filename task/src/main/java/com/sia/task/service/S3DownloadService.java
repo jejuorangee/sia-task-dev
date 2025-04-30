@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+//import org.springframework.transaction.annotation.Transactional;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GetObjectRequest;
@@ -23,7 +23,7 @@ import com.sia.task.fileDTO.FileRequestDTO;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@Transactional(readOnly = true)
+//@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class S3DownloadService {
   private final AmazonS3 amazonS3;
@@ -68,10 +68,10 @@ public class S3DownloadService {
   public List<FileRequestDTO> getObject(List<FileRequestDTO> fileDTO) {
     System.out.println("S3DownloadService.java getObject() 호출");
     List<FileRequestDTO> result = new ArrayList<FileRequestDTO>();
-
+  
     for (FileRequestDTO file : fileDTO) {
-      Path base = Paths.get(downloadBaseDir);
-      Path target;
+      Path base = Paths.get(downloadBaseDir); // 저장될 루트 경로
+      Path target; // 루트 경로 + 원본 파일이름 = 최종 경로와 파일 이름
       try{
         Files.createDirectories(base);
         System.out.println("다운로드 디렉토리 생성됨 : "+base);
@@ -82,9 +82,12 @@ public class S3DownloadService {
         return result;
       }
       
+      // 원본 파일 버킷과 파일이름을 aws S3 요청
       S3Object sobj = amazonS3.getObject(new GetObjectRequest(bucket, file.getOriginalFileName()));
+      // 파일을 InputStream으로 받아옴
       InputStream in = sobj.getObjectContent();
       
+      // 파일을 복사할 때 반환값 확인용
       long isDownload;
       try {
         isDownload = Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);

@@ -8,15 +8,16 @@ import lombok.Getter;
 @Getter
 @Builder
 public class FileResponseDTO {
-  private String originalFileName;
-  private String convertedFileName;
+  private String originalFileName; // 원본 파일 이름
+  private String convertedFileName; // 변환 후 파일 이름
   //private String filePath;
   //private String convertedFilePath;
 
-  private int width;
-  private int height;
-  private int band_count;
+  private int width; // 이미지 가로 크기
+  private int height; // 이미지 세로 크기
+  private int band_count; // 밴드수 ex) RGB = 3
 
+  // entity dto 변환
   public static FileResponseDTO fromEntity(FileEntity entity){
     return FileResponseDTO.builder()
       .originalFileName(entity.getOriginalFileName())

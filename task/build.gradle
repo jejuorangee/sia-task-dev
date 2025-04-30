@@ -10,12 +10,12 @@ group = 'com.sia'
 version = '0.0.1-SNAPSHOT'
 mainClassName = 'com.sia.task.TaskApplication'
 
-application{
-	// installDist로 만든 배포본을 실행할 때 JVM 옵션에 자동 포함
-	applicationDefaultJvmArgs = [
-		"-Djava.library.path=\${APP_HOME}/nativelib/window"
-	]
-}
+// application{
+// 	// installDist로 만든 배포본을 실행할 때 JVM 옵션에 자동 포함
+// 	applicationDefaultJvmArgs = [
+// 		"-Djava.library.path=%APP_HOME%\\bin\\nativelib\\window"
+// 	]
+// }
 
 java {
 	toolchain {
@@ -53,8 +53,8 @@ dependencies {
 
 	/** 파일 업로드 */
 	// https://mvnrepository.com/artifact/commons-io/commons-io
-	implementation 'commons-io:commons-io:2.14.0'// https://mvnrepository.com/artifact/commons-fileupload/commons-fileupload
-	implementation 'commons-fileupload:commons-fileupload:1.5'
+	//implementation 'commons-io:commons-io:2.14.0'// https://mvnrepository.com/artifact/commons-fileupload/commons-fileupload
+	//implementation 'commons-fileupload:commons-fileupload:1.5'
 
 	/** 파일 형식 체크를 위한 라이브러러 */
 	// https://mvnrepository.com/artifact/org.apache.tika/tika-core
@@ -71,11 +71,11 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-// dll build/libs/nativelib/window로 복사
-task copyNativeLibs(type : Copy){
-	from("$projectDir/src/main/resources/nativelib/window")
-	into("$buildDir/libs/nativelib/window")
-}
+// dll build/install/task/bin/nativelib/window로 복사
+// task copyNativeLibs(type : Copy){
+// 	from("$projectDir/src/main/resources/nativelib/window")
+// 	into("$buildDir/install/task/bin/nativelib/window")
+// }
 
 // shadowJar 빌드 전 복사 task 실행
 shadowJar {
@@ -83,15 +83,15 @@ shadowJar {
 	// src/main/resources/* 포함
 	manifest {
 		attributes (
-			'Implementation-Title' : project.name,
-			'Implementation-Version' : project.version,
-			'Main-Class' :mainClassName
+			'Implementation-Title' : project.name, // Implementation-Title: JAR 파일의 메타데이터로 애플리케이션 이름 역할
+			'Implementation-Version' : project.version, // Implementation-Version: 애플리케이션 버전 정보
+			'Main-Class' :mainClassName // Main-Class: JAR 실행 시 시작 클래스 지정 (java -jar xxx.jar 시 실행될 클래스)
 		)
 	}
-	dependsOn copyNativeLibs
-	from(copyNativeLibs){
-		into 'nativelib/window'
-	}
+	// dependsOn copyNativeLibs
+	// from(copyNativeLibs){
+	// 	into 'nativelib/window'
+	// }
 }
 
 // bootRun 에도 개발 중은 같은 경로를 JVM 옵션으로
@@ -102,14 +102,14 @@ bootRun{
 		def gdalData = "${nativeDir}/gdal-data"
 		def proj9Dir = "${nativeDir}/proj9"
 
-		// window가 DLL 의존성을 찾을 때 사용용
+		// window가 DLL 의존성을 찾을 때 사용
 		environment 'PATH', "${nativeDir};${System.getenv('PATH')}"
 
 		// JVM java.library.path
 		jvmArgs += "-Djava.library.path=${nativeDir}"
 
 
-		// gdal 내부 드라이버, 데이터를 찾을 때 사용용
+		// gdal 내부 드라이버, 데이터를 찾을 때 사용
 		environment 'GDAL_DATA', gdalData
 		environment 'PROJ9_LIB', proj9Dir
 	}
@@ -119,24 +119,55 @@ bootRun{
 //    ./gradlew installDist
 //    build/install/<projectName>/
 //    ├── bin/<projectName>    실행 스크립트에 java.library.path 지정
+//     			└── nativelib/window/*.dll
 //    ├── lib/<...>.jar
-//    └── nativelib/window/*.dll
+//    
 distributions{
 	main{
 		contents{
-			into('nativelib/window'){
+			into('bin/nativelib/window'){
 				from("$projectDir/src/main/resources/nativelib/window")
 			}
 		}
 	}
 }
 
-tasks.withType(CreateStartScripts){
-	// 생성된 startScripts 에서 jar 이름을 shadowJar 결과물 이름으로 치환
-	doLast{
-		unixScript.text = unixScript.text.replace(/\.jar/, '-all.jar')
-		windowScript.text = windowScript.text.replace(/\.jar/, '-all.jar')
-	}
+// tasks.withType(CreateStartScripts){
+// 	// 생성된 startScripts 에서 jar 이름을 shadowJar 결과물 이름으로 치환
+// 	doLast{
+// 		unixScript.text = unixScript.text.replace(/\.jar/, '-all.jar')
+// 		windowsScript.text = windowsScript.text.replace('set CLASSPATH=',
+//             'set PATH=%APP_HOME%\\bin\\nativelib\\window;%PATH%\r\nset CLASSPATH=')
+// 	}
+// }
+
+// installDist 작업으로 생성되는 실행 스크립트(task.bat, task)에 대한 후처리 설정
+tasks.withType(CreateStartScripts) {
+    doLast {
+			// windowsScript는 Windows 실행 스크립트(task.bat)의 내용을 문자열로 다룰 수 있게 해줌
+			windowsScript.text = windowsScript.text
+					// 기본 생성된 스크립트는 lib/task-0.0.1-SNAPSHOT.jar를 참조
+					.replace('.jar"', '-all.jar"') // shadowJar 이름으로 변경
+					// set CLASSPATH= 줄을 찾아서 그 앞에 네이티브 DLL 경로 설정을 삽입
+					.replace(
+							'set CLASSPATH=',
+							'''
+							set PATH=%APP_HOME%\\bin\\nativelib\\window;%PATH%
+							set JAVA_OPTS=%JAVA_OPTS% -Djava.library.path=%APP_HOME%\\bin\\nativelib\\window
+							set CLASSPATH='''.stripIndent()
+					)
+					// set PATH=%APP_HOME%\\bin\\nativelib\\window;%PATH%
+					// 네이티브 라이브러리(gdalalljni.dll, gdal.dll 등)를 포함한 경로를 PATH에 추가
+					// windows는 DLL을 PATH 경로에서만 찾기 때문
+
+					// JAVA_OPTS=%JAVA_OPTS% -Djava.library.path=%APP_HOME%\\bin\\nativelib\\window
+					// JVM이 gdalalljni.dll을 찾을 수 있도록 java.library.path 설정
+					// springBoot 내에서 System.loadLibrary("gdalalljni")가 실패하지 않게 함
+
+					// set CLASSPATH='''.
+					// 기존 CLASSPATH 설정 줄을 그대로 유지
+					// stripIndent() 멀티라인 문자열 공백 제거
+    }
 }
 
 tasks.named('installDist'){

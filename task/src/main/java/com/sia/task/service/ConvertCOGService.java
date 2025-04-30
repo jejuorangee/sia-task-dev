@@ -60,6 +60,7 @@ public class ConvertCOGService {
       }
       
       // TranslateOptions객체 인자가 Vector임
+      // Vector는 ArrayList와 같이 List 인터페이스를 상속받는 컬렉션 프레임워크
       Vector<String> options = new Vector<String>();
 
         options.add("-of"); options.add("COG"); // 출력 포맷 COG(Cloud Optimized GeoTiff)드라이버 설정

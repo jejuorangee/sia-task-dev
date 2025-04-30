@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 //import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 //import com.sia.task.fileDTO.FileDTO;
 import com.sia.task.fileDTO.FileRequestDTO;
@@ -36,30 +35,33 @@ public class FileServiceImpl implements FileService{
 
   @Override
   public List<FileResponseDTO> selectAll() {
+    // 모든 FileEntity 조회
     List<FileEntity> entities = fileRepositoty.findAll();
+    // 엔티티 → 응답 DTO로 변환
     return entities.stream()
       .map(FileResponseDTO::fromEntity)
       .collect(Collectors.toList());
   }
   
   @Override
-  @Transactional(readOnly = true)
   public String insert(FileRequestDTO fileRequestDTO) {
+    // 요청 DTO를 Entity로 변환
     FileEntity entity = fileRequestDTO.toEntity();
+    // 저장 후 저장된 파일의 이름 반환
     return fileRepositoty.save(entity).getConvertedFileName();
   }
 
   @Override
   public List<FileResponseDTO> insertAll(List<FileRequestDTO> fileList) {
+    // 요청 DTO 리스트를 Entity 리스트로 변환
     List<FileEntity> entities = fileList.stream()
       .map(FileRequestDTO::toEntity)
       .collect(Collectors.toList());
-
+      // Entity 리스트를 DB에 일괄 저장
       List<FileEntity> saved = fileRepositoty.saveAll(entities);
-
+      // 저장된 Entity 리스트를 응답 DTO 리스트로 변환 후 반환
       return saved.stream()
         .map(FileResponseDTO::fromEntity)
         .collect(Collectors.toList());
   }
-  
 }

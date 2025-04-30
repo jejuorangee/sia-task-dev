@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 //import com.sia.task.fileDTO.FileDTO;
 import com.sia.task.fileDTO.FileRequestDTO;
+import com.sia.task.fileDTO.FileResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,9 +30,13 @@ public class FileProcessingService {
     List<FileRequestDTO> metadatas = extractorService.extractData(convertedList);
     // 변환 파일 DB 저장
     if(metadatas.size() > 1){
-      fileService.insertAll(fileList);
+      List<FileResponseDTO> savedList = fileService.insertAll(fileList);
+      for (FileResponseDTO file : savedList) {
+        System.out.println("file 저장됨 : "+file.getConvertedFileName());
+      }
     }else {
-      fileService.insert(metadatas.get(0));
+      String savedFile = fileService.insert(metadatas.get(0));
+      System.out.println("file 저장됨 : "+savedFile);
     }
 
     // 파일 업로드
